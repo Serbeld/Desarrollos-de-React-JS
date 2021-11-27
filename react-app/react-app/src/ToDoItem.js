@@ -1,11 +1,18 @@
 import React from "react";
+import './ToDoItem.css';
 
-function ToDoItem(props){
-    return(
-        <li>
-            <span>C</span>
-            <p> { props.text } </p>
-            <span>D</span>
+function ToDoItem(props) {
+    return (
+        <li className="ToDoItem">
+            <span className={`Icon Icon-check ${props.completed && 'Icon-check--active'}`}>
+                √
+            </span>
+            <p className={`TodoItem-p ${props.completed && 'TodoItem-p--complete'}`}>
+                {props.text}
+            </p>
+            <span className="Icon Icon-delete">
+                X
+            </span>
         </li>
     );
 }

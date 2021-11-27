@@ -1,0 +1,24 @@
+{
+  "name": "platzireactjs",
+  "version": "1.0.0",
+  "description": "This repository is dedicated to programming practices using Node Js. These programming practices are done through Platzi's React Js course.",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel arquivos/index.js --out-file=arquivos/bundle.js --presets=env,react --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/Serbeld/PlatziReactJS.git"
+  },
+  "author": "Sergio Luis Beleño Diaz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Serbeld/PlatziReactJS/issues"
+  },
+  "homepage": "https://github.com/Serbeld/PlatziReactJS#readme",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1"
+  }
+}
