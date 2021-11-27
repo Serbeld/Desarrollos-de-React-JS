@@ -2,7 +2,7 @@
   "name": "react-app",
   "version": "0.1.1",
   "private": true,
-  "homepage": "https://serbeld.github.io/PlatziReactJS/react-app/react-app/public/",
+  "homepage": "https://serbeld.github.io/PlatziReactJS",
   "dependencies": {
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",

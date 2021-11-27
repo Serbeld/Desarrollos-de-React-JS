@@ -1,26 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+// import './App.css';
 
-function App(props) {
+import React from "react";
+import { ToDoCounter } from "./ToDoCounter";
+import { ToDoSearch } from "./ToDoSearch";
+import { ToDoList } from "./ToDoList";
+import { ToDoItem } from "./ToDoItem";
+import { CreateToDoButton } from "./CreateToDoButton";
+
+const toDos = [
+  { text: 'Programar Flags', completed: false},
+  { text: 'Ajustar estilos del menú de departamentos', completed: false},
+  { text: 'Ajustar estilos de la landing principal', completed: false},
+];
+
+function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {/* { props.message } */}
-          { props.children }
+    <React.Fragment>
 
-        </a>
-      </header>
-    </div>
+      <ToDoCounter title="Esta es una tarea To Do" />
+      
+      <ToDoSearch text="Ingresa un texto relacionado a tu busqueda..." />
+
+      <ToDoList>
+        {toDos.map(toDo => (
+          <ToDoItem key={toDo.text} text= { toDo.text } />
+        ))}
+      </ToDoList>
+
+      <CreateToDoButton />
+    </React.Fragment>
   );
 }
 
