@@ -1,0 +1,11 @@
+.to-do-counter{
+    font-size: 1.8rem;
+    text-align: center;
+    margin: 0;
+    padding: 30px;
+    font-weight: 700;
+}
+
+.to-do-counter span{
+    color: #53a0f8;
+}
