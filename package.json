@@ -4,8 +4,9 @@
   "description": "This repository is dedicated to programming practices using Node Js. These programming practices are done through Platzi's React Js course.",
   "main": "index.js",
   "scripts": {
-    "build": "babel arquivos/index.js --out-file=arquivos/bundle.js --presets=env,react --watch"
-  },
+    "build": "babel arquivos/index.js --out-file=arquivos/bundle.js --presets=env,react --watch",
+    "buildnowatch": "babel arquivos/index.js --out-file=arquivos/bundle.js --presets=env,react"
+},
   "repository": {
     "type": "git",
     "url": "git+https://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@github.com/Serbeld/PlatziReactJS.git"

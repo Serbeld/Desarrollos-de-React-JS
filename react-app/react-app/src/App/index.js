@@ -1,69 +1,56 @@
 // import './App.css';
 
 import React from "react";
+import { useLocalStorage } from '../ToDoContext/UseLocalStorage.js';
 import { AppUI } from './AppUI';
 
-// const defaultToDos = [
-//   { text: 'Programar Flags Sale Event', completed: true },
-//   { text: 'Flags Bancolombia Carrousel', completed: true },
-//   { text: 'Ajustar estilos del menú de departamentos', completed: false },
-//   { text: 'Ajustar estilos de la landing principal', completed: false },
-//   { text: 'Agregar filtro de precios', completed: true },
-// ];
-
 function App() {
-
-  const localStorageTodos = localStorage.getItem('TODOS_V1');
-
-  let parsedTodos;
-
-  if (!localStorageTodos){
-    localStorage.setItem('TODOS_V1', JSON.stringify([]));
-    parsedTodos = [];
-  }else{
-    parsedTodos = JSON.parse(localStorageTodos);
-  }
-
-  const [toDos, setToDo] = React.useState(parsedTodos);
+  const {
+    item: todos,
+    saveItem: saveTodos,
+    loading,
+    error,
+  } = useLocalStorage('TODOS_V1', []);
   const [searchValue, setSearchValue] = React.useState('');
-  let searchedToDos = [];
+
+  let searchedTodos = [];
 
   if (!searchValue.length >= 1) {
-    searchedToDos = toDos;
+    searchedTodos = todos;
   } else {
-    searchedToDos = toDos.filter(todo => {
+    searchedTodos = todos.filter(todo => {
       const todoText = todo.text.toLowerCase();
       const searchText = searchValue.toLowerCase();
       return todoText.includes(searchText);
     });
   }
 
-  const saveTodos = (newTodos) => {
-    const stringifiedTodos = JSON.stringify(newTodos);
-    localStorage.setItem('TODOS_V1', stringifiedTodos);
-    setToDo(newTodos);
-  };
-
   const completeTodo = (text) => {
-    const todoIndex = toDos.findIndex(todo => todo.text === text);
-    const newTodos = [...toDos];
-    newTodos[todoIndex].completed = true;
+    const todoIndex = todos.findIndex(todo => todo.text === text);
+    const newTodos = [...todos];
+    if(newTodos[todoIndex].completed == true){
+    newTodos[todoIndex].completed = false;
+    }else{
+      newTodos[todoIndex].completed = true;
+    }
     saveTodos(newTodos);
   };
 
   const deleteTodo = (text) => {
-    const todoIndex = toDos.findIndex(todo => todo.text === text);
-    const newTodos = [...toDos];
+    const todoIndex = todos.findIndex(todo => todo.text === text);
+    const newTodos = [...todos];
     newTodos.splice(todoIndex, 1);
     saveTodos(newTodos);
   };
 
   return (
     <AppUI
-      toDos={toDos}                 
+      loading={loading}
+      error={error}
+      toDos={todos}                 
       searchValue={searchValue}
       setSearchValue={setSearchValue}
-      searchedToDos={searchedToDos}
+      searchedToDos={searchedTodos}
       completeTodo={completeTodo}
       deleteTodo={deleteTodo}
     />
