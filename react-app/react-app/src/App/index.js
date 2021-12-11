@@ -1,11 +1,7 @@
 // import './App.css';
 
 import React from "react";
-import { ToDoCounter } from "./ToDoCounter";
-import { ToDoSearch } from "./ToDoSearch";
-import { ToDoList } from "./ToDoList";
-import { ToDoItem } from "./ToDoItem";
-import { CreateToDoButton } from "./CreateToDoButton";
+import { AppUI } from './AppUI';
 
 const defaultToDos = [
   { text: 'Programar Flags Sale Event', completed: true },
@@ -45,29 +41,14 @@ function App() {
   };
 
   return (
-    <React.Fragment>
-
-      <ToDoCounter toDosCounter={toDos} />
-
-      <ToDoSearch
-        text="Ingresa un texto relacionado a tu busqueda..."
-        searchValue={searchValue}
-        setSearchValue={setSearchValue}
-      />
-
-      <ToDoList>
-        {searchedToDos.map(ToDo => (
-          <ToDoItem
-            key={ToDo.text}
-            text={ToDo.text}
-            completed={ToDo.completed}
-            onComplete={() => completeTodo(ToDo.text)}
-            onDelete={() => deleteTodo(ToDo.text)}          />
-        ))}
-      </ToDoList>
-
-      <CreateToDoButton />
-    </React.Fragment>
+    <AppUI
+      toDos={toDos}                 
+      searchValue={searchValue}
+      setSearchValue={setSearchValue}
+      searchedToDos={searchedToDos}
+      completeTodo={completeTodo}
+      deleteTodo={deleteTodo}
+    />
   );
 }
 
