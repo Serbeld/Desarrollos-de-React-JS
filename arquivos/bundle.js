@@ -114,25 +114,56 @@ function CreateToDoButton(props) {
     );
 }
 
-var defaultToDos = [{ text: 'Programar Flags Sale Event', completed: true }, { text: 'Flags Bancolombia Carrousel', completed: true }, { text: 'Ajustar estilos del menú de departamentos', completed: false }, { text: 'Ajustar estilos de la landing principal', completed: false }, { text: 'Agregar filtro de precios', completed: true }];
+// const defaultToDos = [
+//     { text: 'Programar Flags Sale Event', completed: true },
+//     { text: 'Flags Bancolombia Carrousel', completed: true },
+//     { text: 'Ajustar estilos del menú de departamentos', completed: false },
+//     { text: 'Ajustar estilos de la landing principal', completed: false },
+//     { text: 'Agregar filtro de precios', completed: true },
+// ];
+
+function useLocalStorage(itemName, initialValue) {
+    var localStorageItem = localStorage.getItem(itemName);
+    var parsedItem = void 0;
+
+    if (!localStorageItem) {
+        localStorage.setItem(itemName, JSON.stringify(initialValue));
+        parsedItem = initialValue;
+    } else {
+        parsedItem = JSON.parse(localStorageItem);
+    }
+
+    var _React$useState = React.useState(parsedItem),
+        _React$useState2 = _slicedToArray(_React$useState, 2),
+        item = _React$useState2[0],
+        setItem = _React$useState2[1];
+
+    var saveItem = function saveItem(newItem) {
+        var stringifiedItem = JSON.stringify(newItem);
+        localStorage.setItem(itemName, stringifiedItem);
+        setItem(newItem);
+    };
+
+    return [item, saveItem];
+}
 
 function App() {
-    var _React$useState = React.useState(defaultToDos),
-        _React$useState2 = _slicedToArray(_React$useState, 2),
-        toDos = _React$useState2[0],
-        setToDo = _React$useState2[1];
+    var _useLocalStorage = useLocalStorage('TODOS_V1', []),
+        _useLocalStorage2 = _slicedToArray(_useLocalStorage, 2),
+        todos = _useLocalStorage2[0],
+        saveTodos = _useLocalStorage2[1];
 
     var _React$useState3 = React.useState(''),
         _React$useState4 = _slicedToArray(_React$useState3, 2),
         searchValue = _React$useState4[0],
         setSearchValue = _React$useState4[1];
 
-    var searchedToDos = [];
+    var searchedTodos = [];
 
     if (!searchValue.length >= 1) {
-        searchedToDos = toDos;
+        searchedTodos = todos;
     } else {
-        searchedToDos = toDos.filter(function (todo) {
+        searchedTodos = todos.filter(function (todo) {
             var todoText = todo.text.toLowerCase();
             var searchText = searchValue.toLowerCase();
             return todoText.includes(searchText);
@@ -140,27 +171,31 @@ function App() {
     }
 
     var completeTodo = function completeTodo(text) {
-        var todoIndex = toDos.findIndex(function (todo) {
+        var todoIndex = todos.findIndex(function (todo) {
             return todo.text === text;
         });
-        var newTodos = [].concat(_toConsumableArray(toDos));
-        newTodos[todoIndex].completed = true;
-        setToDo(newTodos);
+        var newTodos = [].concat(_toConsumableArray(todos));
+        if (newTodos[todoIndex].completed == true) {
+            newTodos[todoIndex].completed = false;
+        } else {
+            newTodos[todoIndex].completed = true;
+        }
+        saveTodos(newTodos);
     };
 
     var deleteTodo = function deleteTodo(text) {
-        var todoIndex = toDos.findIndex(function (todo) {
+        var todoIndex = todos.findIndex(function (todo) {
             return todo.text === text;
         });
-        var newTodos = [].concat(_toConsumableArray(toDos));
+        var newTodos = [].concat(_toConsumableArray(todos));
         newTodos.splice(todoIndex, 1);
-        setToDo(newTodos);
+        saveTodos(newTodos);
     };
 
     return React.createElement(
         React.Fragment,
         null,
-        React.createElement(ToDoCounter, { toDosCounter: toDos }),
+        React.createElement(ToDoCounter, { toDosCounter: todos }),
         React.createElement(ToDoSearch, {
             text: "Ingresa un texto relacionado a tu busqueda...",
             searchValue: searchValue,
@@ -169,7 +204,7 @@ function App() {
         React.createElement(
             ToDoList,
             null,
-            searchedToDos.map(function (ToDo) {
+            searchedTodos.map(function (ToDo) {
                 return React.createElement(ToDoItem, {
                     key: ToDo.text,
                     text: ToDo.text,

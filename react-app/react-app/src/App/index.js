@@ -1,60 +1,8 @@
 // import './App.css';
 
 import React from "react";
+import { useLocalStorage } from '../ToDoContext/UseLocalStorage.js';
 import { AppUI } from './AppUI';
-
-// const defaultToDos = [
-//   { text: 'Programar Flags Sale Event', completed: true },
-//   { text: 'Flags Bancolombia Carrousel', completed: true },
-//   { text: 'Ajustar estilos del menú de departamentos', completed: false },
-//   { text: 'Ajustar estilos de la landing principal', completed: false },
-//   { text: 'Agregar filtro de precios', completed: true },
-// ];
-
-
-function useLocalStorage(itemName, initialValue) {
-  const [error, setError] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-  const [item, setItem] = React.useState(initialValue);
-  
-  React.useEffect(() => {
-    setTimeout(() => {
-      try {
-        const localStorageItem = localStorage.getItem(itemName);
-        let parsedItem;
-        
-        if (!localStorageItem) {
-          localStorage.setItem(itemName, JSON.stringify(initialValue));
-          parsedItem = initialValue;
-        } else {
-          parsedItem = JSON.parse(localStorageItem);
-        }
-
-        setItem(parsedItem);
-        setLoading(false);
-      } catch(error) {
-        setError(error);
-      }
-    }, 1000);
-  });
-  
-  const saveItem = (newItem) => {
-    try {
-      const stringifiedItem = JSON.stringify(newItem);
-      localStorage.setItem(itemName, stringifiedItem);
-      setItem(newItem);
-    } catch(error) {
-      setError(error);
-    }
-  };
-
-  return {
-    item,
-    saveItem,
-    loading,
-    error,
-  };
-}
 
 function App() {
   const {
@@ -80,7 +28,11 @@ function App() {
   const completeTodo = (text) => {
     const todoIndex = todos.findIndex(todo => todo.text === text);
     const newTodos = [...todos];
-    newTodos[todoIndex].completed = true;
+    if(newTodos[todoIndex].completed == true){
+    newTodos[todoIndex].completed = false;
+    }else{
+      newTodos[todoIndex].completed = true;
+    }
     saveTodos(newTodos);
   };
 

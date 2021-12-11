@@ -8,6 +8,8 @@ body {
     background: #020914;
     color: #e7edf3;
     width: 100vw;
+    display: flex;
+    justify-content: center;
 }
 
 code {
@@ -20,6 +22,7 @@ code {
     position: relative;
     top: -1px;
     min-height: 100vh;
+    max-width: 600px;
 }
 
 .CreateTodoButton {
