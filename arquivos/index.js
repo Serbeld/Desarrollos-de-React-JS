@@ -1,3 +1,52 @@
+
+function ToDoForm(props) {
+
+    const [newTodoValue, setNewTodoValue] = React.useState('');
+
+    const onChange = (event) => {
+        setNewTodoValue(event.target.value)
+    }
+
+    const onCancel = () => {
+        props.setOpenModal(false);
+    }
+
+    const onSubmit = (event) => {
+        // stops the redirect
+        event.preventDefault();
+        props.addTodo(newTodoValue);
+        props.setOpenModal(false);
+    }
+
+    return (
+        <form onSubmit={onSubmit}>
+            <label>Escribe tu nueva tarea</label>
+            <textarea
+                value={newTodoValue}
+                onChange={onChange}
+                placeholder="Escribe el título de la tarea..."
+            />
+            <div className="TodoForm-buttonContainer">
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="TodoForm-button TodoForm-button--cancel"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    className="TodoForm-button TodoForm-button--add"
+                >
+                    Añadir
+                </button>
+            </div>
+        </form>
+    );
+
+}
+
 function countOfCompletedTasks(props) {
     let completed = 0
     props.toDosCounter.forEach(ToDo => {
@@ -75,7 +124,7 @@ function Modal({ children }) {
 
 function CreateToDoButton(props) {
     const onClickButton = () => {
-        props.setOpenModal(true)
+        props.setOpenModal(prevState => !prevState);
     };
 
     return (
@@ -138,6 +187,15 @@ function App() {
         });
     }
 
+    const addTodo = (text) => {
+        const newTodos = [...todos];
+        newTodos.push({
+            completed: false,
+            text
+        })
+        saveTodos(newTodos);
+    };
+
     const completeTodo = (text) => {
         const todoIndex = todos.findIndex(todo => todo.text === text);
         const newTodos = [...todos];
@@ -180,11 +238,11 @@ function App() {
 
             {!!openModal && (
                 <Modal>
-                    <p>{searchedToDos[0]?.text}</p>
+                    <ToDoForm addTodo={addTodo} setOpenModal={setOpenModal} />
                 </Modal>
             )}
 
-            <CreateToDoButton 
+            <CreateToDoButton
                 setOpenModal={setOpenModal}
             />
         </React.Fragment>

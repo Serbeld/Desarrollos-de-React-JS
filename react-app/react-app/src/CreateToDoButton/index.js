@@ -3,7 +3,7 @@ import './CreateToDoButton.css';
 
 function CreateToDoButton(props) {
     const onClickButton = () => {
-        props.setOpenModal(true)
+        props.setOpenModal(prevState => !prevState);
     };
 
     return (

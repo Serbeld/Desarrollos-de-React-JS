@@ -3,6 +3,7 @@ import { ToDoCounter } from "../ToDoCounter";
 import { ToDoSearch } from "../ToDoSearch";
 import { ToDoList } from "../ToDoList";
 import { ToDoItem } from "../ToDoItem";
+import { ToDoForm } from "../ToDoForm";
 import { CreateToDoButton } from "../CreateToDoButton";
 import { Modal } from "../Modal";
 
@@ -13,6 +14,7 @@ function AppUI({
     searchValue,
     setSearchValue,
     searchedToDos,
+    addTodo,
     completeTodo,
     deleteTodo,
     openModal,
@@ -47,7 +49,7 @@ function AppUI({
 
             {!!openModal && (
                 <Modal>
-                    <p>{searchedToDos[0]?.text}</p>
+                    <ToDoForm addTodo={addTodo} setOpenModal={setOpenModal} />
                 </Modal>
             )}
 

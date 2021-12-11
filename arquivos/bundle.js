@@ -4,6 +4,64 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+function ToDoForm(props) {
+    var _React$useState = React.useState(''),
+        _React$useState2 = _slicedToArray(_React$useState, 2),
+        newTodoValue = _React$useState2[0],
+        setNewTodoValue = _React$useState2[1];
+
+    var onChange = function onChange(event) {
+        setNewTodoValue(event.target.value);
+    };
+
+    var onCancel = function onCancel() {
+        props.setOpenModal(false);
+    };
+
+    var onSubmit = function onSubmit(event) {
+        // stops the redirect
+        event.preventDefault();
+        props.addTodo(newTodoValue);
+        props.setOpenModal(false);
+    };
+
+    return React.createElement(
+        "form",
+        { onSubmit: onSubmit },
+        React.createElement(
+            "label",
+            null,
+            "Escribe tu nueva tarea"
+        ),
+        React.createElement("textarea", {
+            value: newTodoValue,
+            onChange: onChange,
+            placeholder: "Escribe el t\xEDtulo de la tarea..."
+        }),
+        React.createElement(
+            "div",
+            { className: "TodoForm-buttonContainer" },
+            React.createElement(
+                "button",
+                {
+                    type: "button",
+                    onClick: onCancel,
+                    className: "TodoForm-button TodoForm-button--cancel"
+                },
+                "Cancelar"
+            ),
+            React.createElement(
+                "button",
+                {
+                    type: "submit",
+                    className: "TodoForm-button TodoForm-button--add"
+                },
+                "A\xF1adir"
+            )
+        )
+    );
+}
+
 function countOfCompletedTasks(props) {
     var completed = 0;
     props.toDosCounter.forEach(function (ToDo) {
@@ -97,18 +155,28 @@ function ToDoSearch(_ref) {
     });
 }
 
+function Modal(_ref2) {
+    var children = _ref2.children;
+
+    return ReactDOM.createPortal(React.createElement(
+        "div",
+        { className: "ModalBackground" },
+        children
+    ), document.getElementById('modal'));
+}
+
 function CreateToDoButton(props) {
-    var onClickButton = function onClickButton(msg) {
-        alert(msg);
+    var onClickButton = function onClickButton() {
+        props.setOpenModal(function (prevState) {
+            return !prevState;
+        });
     };
 
     return React.createElement(
         "button",
         {
             className: "CreateTodoButton",
-            onClick: function onClick() {
-                return onClickButton('Aquí se debería abrir el modal');
-            }
+            onClick: onClickButton
         },
         "+"
     );
@@ -133,10 +201,10 @@ function useLocalStorage(itemName, initialValue) {
         parsedItem = JSON.parse(localStorageItem);
     }
 
-    var _React$useState = React.useState(parsedItem),
-        _React$useState2 = _slicedToArray(_React$useState, 2),
-        item = _React$useState2[0],
-        setItem = _React$useState2[1];
+    var _React$useState3 = React.useState(parsedItem),
+        _React$useState4 = _slicedToArray(_React$useState3, 2),
+        item = _React$useState4[0],
+        setItem = _React$useState4[1];
 
     var saveItem = function saveItem(newItem) {
         var stringifiedItem = JSON.stringify(newItem);
@@ -153,10 +221,15 @@ function App() {
         todos = _useLocalStorage2[0],
         saveTodos = _useLocalStorage2[1];
 
-    var _React$useState3 = React.useState(''),
-        _React$useState4 = _slicedToArray(_React$useState3, 2),
-        searchValue = _React$useState4[0],
-        setSearchValue = _React$useState4[1];
+    var _React$useState5 = React.useState(''),
+        _React$useState6 = _slicedToArray(_React$useState5, 2),
+        searchValue = _React$useState6[0],
+        setSearchValue = _React$useState6[1];
+
+    var _React$useState7 = React.useState(false),
+        _React$useState8 = _slicedToArray(_React$useState7, 2),
+        openModal = _React$useState8[0],
+        setOpenModal = _React$useState8[1];
 
     var searchedTodos = [];
 
@@ -170,12 +243,21 @@ function App() {
         });
     }
 
+    var addTodo = function addTodo(text) {
+        var newTodos = [].concat(_toConsumableArray(todos));
+        newTodos.push({
+            completed: false,
+            text: text
+        });
+        saveTodos(newTodos);
+    };
+
     var completeTodo = function completeTodo(text) {
         var todoIndex = todos.findIndex(function (todo) {
             return todo.text === text;
         });
         var newTodos = [].concat(_toConsumableArray(todos));
-        if (newTodos[todoIndex].completed == true) {
+        if (newTodos[todoIndex].completed === true) {
             newTodos[todoIndex].completed = false;
         } else {
             newTodos[todoIndex].completed = true;
@@ -217,7 +299,14 @@ function App() {
                     } });
             })
         ),
-        React.createElement(CreateToDoButton, null)
+        !!openModal && React.createElement(
+            Modal,
+            null,
+            React.createElement(ToDoForm, { addTodo: addTodo, setOpenModal: setOpenModal })
+        ),
+        React.createElement(CreateToDoButton, {
+            setOpenModal: setOpenModal
+        })
     );
 }
 
