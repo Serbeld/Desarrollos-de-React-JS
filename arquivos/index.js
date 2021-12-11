@@ -6,9 +6,10 @@ function ToDoForm(props) {
     const onChange = (event) => {
         setNewTodoValue(event.target.value)
     }
-
     const onCancel = () => {
         props.setOpenModal(false);
+        let element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     }
 
     const onSubmit = (event) => {
@@ -16,6 +17,8 @@ function ToDoForm(props) {
         event.preventDefault();
         props.addTodo(newTodoValue);
         props.setOpenModal(false);
+        let element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     }
 
     return (
@@ -72,7 +75,7 @@ function ToDoItem(props) {
                 className={`Icon Icon-check ${props.completed && 'Icon-check--active'}`}
                 onClick={props.onComplete}
             >
-                √
+                <i class="fas fa-check-square"></i>
             </span>
             <p className={`TodoItem-p ${props.completed && 'TodoItem-p--complete'}`}>
                 {props.text}
@@ -81,7 +84,7 @@ function ToDoItem(props) {
                 className="Icon Icon-delete"
                 onClick={props.onDelete}
             >
-                X
+                <i class="far fa-trash-alt"></i>
             </span>
         </li>
     );
@@ -96,20 +99,28 @@ function ToDoList(props) {
         </section>
     );
 }
-
 function ToDoSearch({ searchValue, setSearchValue, text }) {
     const onSearchValueChange = (event) => {
         // console.log(event.target.value);
         setSearchValue(event.target.value);
     };
 
+    const onClickCloseSearch = (event) => {
+        setSearchValue("");
+    }
+
     return (
-        <input
-            className="TodoSearch"
-            placeholder={text}
-            value={searchValue}
-            onChange={onSearchValueChange}
-        />
+        <div className="search-container">
+            <input
+                className="TodoSearch"
+                placeholder={text}
+                value={searchValue}
+                onChange={onSearchValueChange}
+            />
+            <i className="fas fa-window-close"
+                onClick={onClickCloseSearch}
+                ></i>
+        </div>
     );
 }
 
@@ -125,6 +136,8 @@ function Modal({ children }) {
 function CreateToDoButton(props) {
     const onClickButton = () => {
         props.setOpenModal(prevState => !prevState);
+        let element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     };
 
     return (

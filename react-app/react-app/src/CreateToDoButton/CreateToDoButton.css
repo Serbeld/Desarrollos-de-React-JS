@@ -25,3 +25,9 @@
     transform: rotate(224deg);
     background-color: #f85353;
 }
+
+
+.CreateTodoButton.close {
+    transform: rotate(224deg);
+    background-color: #f85353;
+}
