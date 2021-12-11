@@ -12,6 +12,7 @@ function App() {
     error,
   } = useLocalStorage('TODOS_V1', []);
   const [searchValue, setSearchValue] = React.useState('');
+  const [openModal, setOpenModal] = React.useState(false);
 
   let searchedTodos = [];
 
@@ -28,9 +29,9 @@ function App() {
   const completeTodo = (text) => {
     const todoIndex = todos.findIndex(todo => todo.text === text);
     const newTodos = [...todos];
-    if(newTodos[todoIndex].completed == true){
-    newTodos[todoIndex].completed = false;
-    }else{
+    if (newTodos[todoIndex].completed === true) {
+      newTodos[todoIndex].completed = false;
+    } else {
       newTodos[todoIndex].completed = true;
     }
     saveTodos(newTodos);
@@ -47,12 +48,14 @@ function App() {
     <AppUI
       loading={loading}
       error={error}
-      toDos={todos}                 
+      toDos={todos}
       searchValue={searchValue}
       setSearchValue={setSearchValue}
       searchedToDos={searchedTodos}
       completeTodo={completeTodo}
       deleteTodo={deleteTodo}
+      openModal={openModal}
+      setOpenModal={setOpenModal}
     />
   );
 }

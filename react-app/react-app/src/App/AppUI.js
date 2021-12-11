@@ -4,16 +4,19 @@ import { ToDoSearch } from "../ToDoSearch";
 import { ToDoList } from "../ToDoList";
 import { ToDoItem } from "../ToDoItem";
 import { CreateToDoButton } from "../CreateToDoButton";
+import { Modal } from "../Modal";
 
 function AppUI({
     loading,
     error,
-    toDos,               
+    toDos,
     searchValue,
     setSearchValue,
     searchedToDos,
     completeTodo,
     deleteTodo,
+    openModal,
+    setOpenModal,
 }) {
     return (
         <React.Fragment>
@@ -28,9 +31,9 @@ function AppUI({
 
             <ToDoList>
 
-            {error && <li className="ToDoItem"><p className="TodoItem-p false">Hubo un error, intenta recargar la página...</p></li>}
-            {loading && <li className="ToDoItem"><p className="TodoItem-p false">Cargando listado de tareas...</p></li>}
-            {(!loading && !searchedToDos.length) && <li className="ToDoItem"><p className="TodoItem-p false">¡Crea una nueva tarea!</p></li>}
+                {error && <li className="ToDoItem"><p className="TodoItem-p false">Hubo un error, intenta recargar la página...</p></li>}
+                {loading && <li className="ToDoItem"><p className="TodoItem-p false">Cargando listado de tareas...</p></li>}
+                {(!loading && !searchedToDos.length) && <li className="ToDoItem"><p className="TodoItem-p false">¡Crea una nueva tarea!</p></li>}
 
                 {searchedToDos.map(ToDo => (
                     <ToDoItem
@@ -42,7 +45,15 @@ function AppUI({
                 ))}
             </ToDoList>
 
-            <CreateToDoButton />
+            {!!openModal && (
+                <Modal>
+                    <p>{searchedToDos[0]?.text}</p>
+                </Modal>
+            )}
+
+            <CreateToDoButton 
+                setOpenModal={setOpenModal}
+            />
         </React.Fragment>
     );
 }

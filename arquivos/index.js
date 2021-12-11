@@ -64,17 +64,24 @@ function ToDoSearch({ searchValue, setSearchValue, text }) {
     );
 }
 
-
+function Modal({ children }) {
+    return ReactDOM.createPortal(
+        <div className="ModalBackground">
+            {children}
+        </div>,
+        document.getElementById('modal')
+    );
+}
 
 function CreateToDoButton(props) {
-    const onClickButton = (msg) => {
-        alert(msg);
+    const onClickButton = () => {
+        props.setOpenModal(true)
     };
 
     return (
         <button
             className="CreateTodoButton"
-            onClick={() => onClickButton('Aquí se debería abrir el modal')}
+            onClick={onClickButton}
         >
             +
         </button>
@@ -117,6 +124,7 @@ function useLocalStorage(itemName, initialValue) {
 function App() {
     const [todos, saveTodos] = useLocalStorage('TODOS_V1', []);
     const [searchValue, setSearchValue] = React.useState('');
+    const [openModal, setOpenModal] = React.useState(false);
 
     let searchedTodos = [];
 
@@ -133,7 +141,7 @@ function App() {
     const completeTodo = (text) => {
         const todoIndex = todos.findIndex(todo => todo.text === text);
         const newTodos = [...todos];
-        if (newTodos[todoIndex].completed == true) {
+        if (newTodos[todoIndex].completed === true) {
             newTodos[todoIndex].completed = false;
         } else {
             newTodos[todoIndex].completed = true;
@@ -170,7 +178,15 @@ function App() {
                 ))}
             </ToDoList>
 
-            <CreateToDoButton />
+            {!!openModal && (
+                <Modal>
+                    <p>{searchedToDos[0]?.text}</p>
+                </Modal>
+            )}
+
+            <CreateToDoButton 
+                setOpenModal={setOpenModal}
+            />
         </React.Fragment>
     );
 }
