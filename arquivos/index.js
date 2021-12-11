@@ -1,3 +1,52 @@
+
+function ToDoForm(props) {
+
+    const [newTodoValue, setNewTodoValue] = React.useState('');
+
+    const onChange = (event) => {
+        setNewTodoValue(event.target.value)
+    }
+
+    const onCancel = () => {
+        props.setOpenModal(false);
+    }
+
+    const onSubmit = (event) => {
+        // stops the redirect
+        event.preventDefault();
+        props.addTodo(newTodoValue);
+        props.setOpenModal(false);
+    }
+
+    return (
+        <form onSubmit={onSubmit}>
+            <label>Escribe tu nueva tarea</label>
+            <textarea
+                value={newTodoValue}
+                onChange={onChange}
+                placeholder="Escribe el título de la tarea..."
+            />
+            <div className="TodoForm-buttonContainer">
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="TodoForm-button TodoForm-button--cancel"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    className="TodoForm-button TodoForm-button--add"
+                >
+                    Añadir
+                </button>
+            </div>
+        </form>
+    );
+
+}
+
 function countOfCompletedTasks(props) {
     let completed = 0
     props.toDosCounter.forEach(ToDo => {
@@ -64,17 +113,24 @@ function ToDoSearch({ searchValue, setSearchValue, text }) {
     );
 }
 
-
+function Modal({ children }) {
+    return ReactDOM.createPortal(
+        <div className="ModalBackground">
+            {children}
+        </div>,
+        document.getElementById('modal')
+    );
+}
 
 function CreateToDoButton(props) {
-    const onClickButton = (msg) => {
-        alert(msg);
+    const onClickButton = () => {
+        props.setOpenModal(prevState => !prevState);
     };
 
     return (
         <button
             className="CreateTodoButton"
-            onClick={() => onClickButton('Aquí se debería abrir el modal')}
+            onClick={onClickButton}
         >
             +
         </button>
@@ -117,6 +173,7 @@ function useLocalStorage(itemName, initialValue) {
 function App() {
     const [todos, saveTodos] = useLocalStorage('TODOS_V1', []);
     const [searchValue, setSearchValue] = React.useState('');
+    const [openModal, setOpenModal] = React.useState(false);
 
     let searchedTodos = [];
 
@@ -130,10 +187,19 @@ function App() {
         });
     }
 
+    const addTodo = (text) => {
+        const newTodos = [...todos];
+        newTodos.push({
+            completed: false,
+            text
+        })
+        saveTodos(newTodos);
+    };
+
     const completeTodo = (text) => {
         const todoIndex = todos.findIndex(todo => todo.text === text);
         const newTodos = [...todos];
-        if (newTodos[todoIndex].completed == true) {
+        if (newTodos[todoIndex].completed === true) {
             newTodos[todoIndex].completed = false;
         } else {
             newTodos[todoIndex].completed = true;
@@ -170,7 +236,15 @@ function App() {
                 ))}
             </ToDoList>
 
-            <CreateToDoButton />
+            {!!openModal && (
+                <Modal>
+                    <ToDoForm addTodo={addTodo} setOpenModal={setOpenModal} />
+                </Modal>
+            )}
+
+            <CreateToDoButton
+                setOpenModal={setOpenModal}
+            />
         </React.Fragment>
     );
 }
