@@ -13,9 +13,10 @@ function ToDoForm(props) {
     var onChange = function onChange(event) {
         setNewTodoValue(event.target.value);
     };
-
     var onCancel = function onCancel() {
         props.setOpenModal(false);
+        var element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     };
 
     var onSubmit = function onSubmit(event) {
@@ -23,6 +24,8 @@ function ToDoForm(props) {
         event.preventDefault();
         props.addTodo(newTodoValue);
         props.setOpenModal(false);
+        var element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     };
 
     return React.createElement(
@@ -107,7 +110,7 @@ function ToDoItem(props) {
                 className: "Icon Icon-check " + (props.completed && 'Icon-check--active'),
                 onClick: props.onComplete
             },
-            "\u221A"
+            React.createElement("i", { "class": "fas fa-check-square" })
         ),
         React.createElement(
             "p",
@@ -120,7 +123,7 @@ function ToDoItem(props) {
                 className: "Icon Icon-delete",
                 onClick: props.onDelete
             },
-            "X"
+            React.createElement("i", { "class": "far fa-trash-alt" })
         )
     );
 }
@@ -136,7 +139,6 @@ function ToDoList(props) {
         )
     );
 }
-
 function ToDoSearch(_ref) {
     var searchValue = _ref.searchValue,
         setSearchValue = _ref.setSearchValue,
@@ -147,12 +149,23 @@ function ToDoSearch(_ref) {
         setSearchValue(event.target.value);
     };
 
-    return React.createElement("input", {
-        className: "TodoSearch",
-        placeholder: text,
-        value: searchValue,
-        onChange: onSearchValueChange
-    });
+    var onClickCloseSearch = function onClickCloseSearch(event) {
+        setSearchValue("");
+    };
+
+    return React.createElement(
+        "div",
+        { className: "search-container" },
+        React.createElement("input", {
+            className: "TodoSearch",
+            placeholder: text,
+            value: searchValue,
+            onChange: onSearchValueChange
+        }),
+        React.createElement("i", { className: "fas fa-window-close",
+            onClick: onClickCloseSearch
+        })
+    );
 }
 
 function Modal(_ref2) {
@@ -170,6 +183,8 @@ function CreateToDoButton(props) {
         props.setOpenModal(function (prevState) {
             return !prevState;
         });
+        var element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     };
 
     return React.createElement(
