@@ -7,13 +7,22 @@ function ToDoSearch({ searchValue, setSearchValue, text }) {
         setSearchValue(event.target.value);
     };
 
+    const onClickCloseSearch = (event) => {
+        setSearchValue("");
+    }
+
     return (
-        <input
-            className="TodoSearch"
-            placeholder={text}
-            value={searchValue}
-            onChange={onSearchValueChange}
-        />
+        <div className="search-container">
+            <input
+                className="TodoSearch"
+                placeholder={text}
+                value={searchValue}
+                onChange={onSearchValueChange}
+            />
+            <i className="fas fa-window-close"
+                onClick={onClickCloseSearch}
+                ></i>
+        </div>
     );
 }
 

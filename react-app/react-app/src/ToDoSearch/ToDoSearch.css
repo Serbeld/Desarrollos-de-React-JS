@@ -25,3 +25,8 @@
     box-shadow: 0px 5px 25px rgba(24, 68, 140, 0.5);
     transition: all 0.5s;
 }
+
+i.fas.fa-window-close {
+    position: absolute;
+    cursor: pointer;
+}

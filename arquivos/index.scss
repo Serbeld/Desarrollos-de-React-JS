@@ -236,3 +236,13 @@ textarea::placeholder {
     color: #e7edf3;
     background: transparent;
 }
+
+i.fas.fa-window-close {
+    position: absolute;
+    cursor: pointer;
+}
+
+.CreateTodoButton.close {
+    transform: rotate(224deg);
+    background-color: #f85353;
+}

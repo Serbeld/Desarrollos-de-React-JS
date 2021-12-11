@@ -11,6 +11,8 @@ function ToDoForm(props){
 
     const onCancel = () => {
         props.setOpenModal(false);
+        let element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     }
 
     const onSubmit = (event) => {
@@ -18,6 +20,8 @@ function ToDoForm(props){
         event.preventDefault();
         props.addTodo(newTodoValue);
         props.setOpenModal(false);
+        let element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
     }
 
     return(
