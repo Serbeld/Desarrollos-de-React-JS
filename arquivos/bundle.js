@@ -28,6 +28,12 @@ function ToDoForm(props) {
         element[0].classList.toggle("close");
     };
 
+    var commentEnterSubmit = function commentEnterSubmit(e) {
+        if (e.key === "Enter" && e.shiftKey === false) {
+            return onSubmit(e);
+        }
+    };
+
     return React.createElement(
         "form",
         { onSubmit: onSubmit },
@@ -39,6 +45,7 @@ function ToDoForm(props) {
         React.createElement("textarea", {
             value: newTodoValue,
             onChange: onChange,
+            onKeyPress: commentEnterSubmit,
             placeholder: "Escribe el t\xEDtulo de la tarea..."
         }),
         React.createElement(

@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-function ToDoForm(props){
+function ToDoForm(props) {
 
     const [newTodoValue, setNewTodoValue] = React.useState('');
 
@@ -24,12 +24,19 @@ function ToDoForm(props){
         element[0].classList.toggle("close");
     }
 
-    return(
+    const commentEnterSubmit = (e) => {
+        if (e.key === "Enter" && e.shiftKey === false) {
+            return onSubmit(e);
+        }
+    }
+
+    return (
         <form onSubmit={onSubmit}>
             <label>Escribe tu nueva tarea</label>
             <textarea
                 value={newTodoValue}
                 onChange={onChange}
+                onKeyPress={commentEnterSubmit}
                 placeholder="Escribe el título de la tarea..."
             />
             <div className="TodoForm-buttonContainer">
@@ -37,14 +44,14 @@ function ToDoForm(props){
                     type="button"
                     onClick={onCancel}
                     className="TodoForm-button TodoForm-button--cancel"
-                    >
+                >
                     Cancelar
                 </button>
-                
+
                 <button
-                    type="submit"          
+                    type="submit"
                     className="TodoForm-button TodoForm-button--add"
-                    >
+                >
                     Añadir
                 </button>
             </div>
