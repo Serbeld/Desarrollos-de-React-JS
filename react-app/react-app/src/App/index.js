@@ -11,6 +11,7 @@ import { CreateToDoButton } from "../CreateToDoButton";
 import { Modal } from "../Modal";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useLocalStorage } from '../ToDoContext/UseLocalStorage.js';
+import { ChangeAlertWithStorageListener } from '../ChangeAlert';
 
 function App() {
   const {
@@ -18,6 +19,7 @@ function App() {
     saveItem: saveTodos,
     loading,
     error,
+    sincronizeItem: sincronizeTodos,
   } = useLocalStorage('TODOS_V1', []);
   const [searchValue, setSearchValue] = React.useState('');
   const [openModal, setOpenModal] = React.useState(false);
@@ -147,6 +149,10 @@ function App() {
 
       <CreateToDoButton
         setOpenModal={setOpenModal}
+      />
+
+      <ChangeAlertWithStorageListener 
+        sincronizeTodos={sincronizeTodos}
       />
     </React.Fragment>
   );
