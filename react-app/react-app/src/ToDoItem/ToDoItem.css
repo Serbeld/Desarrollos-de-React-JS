@@ -44,10 +44,19 @@
 
 .Icon-delete {
     position: absolute;
-    top: -20px;
-    right: -1.2rem;
+    right: -0.2rem;
 }
 
 .Icon-delete:hover {
     color: #f85353;
+}
+
+span.Icon.Icon-move {
+    left: 2.2em;
+    position: relative;
+}
+
+span.Icon.Icon-edit {
+    position: absolute;
+    right: 2.8rem;
 }

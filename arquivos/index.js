@@ -1,4 +1,3 @@
-
 function ToDoForm(props) {
 
     const [newTodoValue, setNewTodoValue] = React.useState('');
@@ -6,6 +5,7 @@ function ToDoForm(props) {
     const onChange = (event) => {
         setNewTodoValue(event.target.value)
     }
+
     const onCancel = () => {
         props.setOpenModal(false);
         let element = document.getElementsByClassName("CreateTodoButton");
@@ -15,10 +15,12 @@ function ToDoForm(props) {
     const onSubmit = (event) => {
         // stops the redirect
         event.preventDefault();
-        props.addTodo(newTodoValue);
-        props.setOpenModal(false);
-        let element = document.getElementsByClassName("CreateTodoButton");
-        element[0].classList.toggle("close");
+        if(newTodoValue.length){
+            props.addTodo(newTodoValue);
+            props.setOpenModal(false);
+            let element = document.getElementsByClassName("CreateTodoButton");
+            element[0].classList.toggle("close");
+        }
     }
 
     const commentEnterSubmit = (e) => {
@@ -76,24 +78,44 @@ function ToDoCounter(props) {
 
 function ToDoItem(props) {
 
+    const onClickButton = () => {
+        props.setOpenEditModal(prevState => !prevState);
+        props.onSetIndexEditFunction();
+        let element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
+    };
+
     return (
         <li className="ToDoItem">
             <span
                 className={`Icon Icon-check ${props.completed && 'Icon-check--active'}`}
                 onClick={props.onComplete}
             >
-                <i class="fas fa-check-square"></i>
+                <i className="fas fa-check-square"></i>
+            </span>
+            <span
+                className={'Icon Icon-move'}
+            >
+                <i className="fas fa-th"></i>
             </span>
             <p className={`TodoItem-p ${props.completed && 'TodoItem-p--complete'}`}>
                 {props.text}
             </p>
             <span
+                className="Icon Icon-edit"
+                onClick={onClickButton}
+            >
+                <i className="fas fa-edit"></i>
+            </span>
+            <span
                 className="Icon Icon-delete"
                 onClick={props.onDelete}
             >
-                <i class="far fa-trash-alt"></i>
+                <i className="far fa-trash-alt"></i>
             </span>
         </li>
+
+        
     );
 }
 
@@ -106,6 +128,7 @@ function ToDoList(props) {
         </section>
     );
 }
+
 function ToDoSearch({ searchValue, setSearchValue, text }) {
     const onSearchValueChange = (event) => {
         // console.log(event.target.value);
@@ -126,7 +149,7 @@ function ToDoSearch({ searchValue, setSearchValue, text }) {
             />
             <i className="fas fa-window-close"
                 onClick={onClickCloseSearch}
-                ></i>
+            ></i>
         </div>
     );
 }
@@ -157,6 +180,67 @@ function CreateToDoButton(props) {
     );
 }
 
+function ToDoEditForm(props) {
+
+    const [newTodoValue, setNewTodoValue] = React.useState('');
+
+    const onChange = (event) => {
+        setNewTodoValue(event.target.value)
+    }
+
+    const onCancel = () => {
+        props.setOpenEditModal(false);
+        let element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
+    }
+
+    const onSubmit = (event) => {
+        // stops the redirect
+        event.preventDefault();
+        if(newTodoValue.length){
+            props.editTodo(props.indexEdit, newTodoValue);
+            props.setOpenEditModal(false);
+            let element = document.getElementsByClassName("CreateTodoButton");
+            element[0].classList.toggle("close");
+        }
+    }
+
+    const commentEnterSubmit = (e) => {
+        if (e.key === "Enter" && e.shiftKey === false) {
+            return onSubmit(e);
+        }
+    }
+
+    return (
+        <form onSubmit={onSubmit}>
+            <label>Edita el título de la tarea</label>
+            <textarea
+                value={newTodoValue}
+                onChange={onChange}
+                onKeyPress={commentEnterSubmit}
+                placeholder="Escribe el título de la tarea..."
+            />
+            <div className="TodoForm-buttonContainer">
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="TodoForm-button TodoForm-button--cancel"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    className="TodoForm-button TodoForm-button--add"
+                >
+                    Editar
+                </button>
+            </div>
+        </form>
+    );
+
+}
+
 // const defaultToDos = [
 //     { text: 'Programar Flags Sale Event', completed: true },
 //     { text: 'Flags Bancolombia Carrousel', completed: true },
@@ -166,34 +250,58 @@ function CreateToDoButton(props) {
 // ];
 
 function useLocalStorage(itemName, initialValue) {
-    const localStorageItem = localStorage.getItem(itemName);
-    let parsedItem;
+    const [error, setError] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
+    const [item, setItem] = React.useState(initialValue);
 
-    if (!localStorageItem) {
-        localStorage.setItem(itemName, JSON.stringify(initialValue));
-        parsedItem = initialValue;
-    } else {
-        parsedItem = JSON.parse(localStorageItem);
-    }
+    React.useEffect(() => {
+            try {
+                const localStorageItem = localStorage.getItem(itemName);
+                let parsedItem;
 
-    const [item, setItem] = React.useState(parsedItem);
+                if (!localStorageItem) {
+                    localStorage.setItem(itemName, JSON.stringify(initialValue));
+                    parsedItem = initialValue;
+                } else {
+                    parsedItem = JSON.parse(localStorageItem);
+                }
+
+                setItem(parsedItem);
+                setLoading(false);
+            } catch (error) {
+                setError(error);
+            }
+    },[]);
 
     const saveItem = (newItem) => {
-        const stringifiedItem = JSON.stringify(newItem);
-        localStorage.setItem(itemName, stringifiedItem);
-        setItem(newItem);
+        try {
+            const stringifiedItem = JSON.stringify(newItem);
+            localStorage.setItem(itemName, stringifiedItem);
+            setItem(newItem);
+        } catch (error) {
+            setError(error);
+        }
     };
 
-    return [
+    return {
         item,
         saveItem,
-    ];
+        loading,
+        error,
+    };
 }
 
 function App() {
-    const [todos, saveTodos] = useLocalStorage('TODOS_V1', []);
+    const {
+        item: todos,
+        saveItem: saveTodos,
+        loading,
+        error,
+    } = useLocalStorage('TODOS_V1', []);
     const [searchValue, setSearchValue] = React.useState('');
     const [openModal, setOpenModal] = React.useState(false);
+    const [openEditModal, setOpenEditModal] = React.useState(false);
+    const [indexEdit, setindexEdit] = React.useState();
 
     let searchedTodos = [];
 
@@ -234,6 +342,17 @@ function App() {
         saveTodos(newTodos);
     };
 
+    const editTodo = (text, newText) => {
+        const todoIndex = todos.findIndex(todo => todo.text === text);
+        const newTodos = [...todos];
+        newTodos[todoIndex].text = newText;
+        saveTodos(newTodos);
+    };
+
+    const setIndexEditFunction = (text) => {
+        setindexEdit(text);
+    };
+
     return (
         <React.Fragment>
 
@@ -246,19 +365,33 @@ function App() {
             />
 
             <ToDoList>
+
+                {error && <li className="ToDoItem"><p className="TodoItem-p false">Hubo un error, intenta recargar la página...</p></li>}
+                {loading && <li className="ToDoItem"><p className="TodoItem-p false">Cargando listado de tareas...</p></li>}
+                {(!loading && !searchedTodos.length && !searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">¡Crea una nueva tarea!</p></li>}
+                {(!loading && !searchedTodos.length && !!searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">No se encontraron resultados para "<b>{searchValue}</b>" </p></li>}
+
                 {searchedTodos.map(ToDo => (
                     <ToDoItem
                         key={ToDo.text}
                         text={ToDo.text}
                         completed={ToDo.completed}
                         onComplete={() => completeTodo(ToDo.text)}
-                        onDelete={() => deleteTodo(ToDo.text)} />
+                        onDelete={() => deleteTodo(ToDo.text)}
+                        onSetIndexEditFunction={() => setIndexEditFunction(ToDo.text)}
+                        setOpenEditModal={setOpenEditModal} />
                 ))}
             </ToDoList>
 
             {!!openModal && (
                 <Modal>
                     <ToDoForm addTodo={addTodo} setOpenModal={setOpenModal} />
+                </Modal>
+            )}
+
+            {!!openEditModal && (
+                <Modal>
+                    <ToDoEditForm indexEdit={indexEdit} editTodo={editTodo} setOpenEditModal={setOpenEditModal} />
                 </Modal>
             )}
 

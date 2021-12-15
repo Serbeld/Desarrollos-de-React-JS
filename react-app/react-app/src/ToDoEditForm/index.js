@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-function ToDoForm(props) {
+function ToDoEditForm(props) {
 
     const [newTodoValue, setNewTodoValue] = React.useState('');
 
@@ -10,7 +10,7 @@ function ToDoForm(props) {
     }
 
     const onCancel = () => {
-        props.setOpenModal(false);
+        props.setOpenEditModal(false);
         let element = document.getElementsByClassName("CreateTodoButton");
         element[0].classList.toggle("close");
     }
@@ -19,8 +19,8 @@ function ToDoForm(props) {
         // stops the redirect
         event.preventDefault();
         if(newTodoValue.length){
-            props.addTodo(newTodoValue);
-            props.setOpenModal(false);
+            props.editTodo(props.indexEdit, newTodoValue);
+            props.setOpenEditModal(false);
             let element = document.getElementsByClassName("CreateTodoButton");
             element[0].classList.toggle("close");
         }
@@ -34,7 +34,7 @@ function ToDoForm(props) {
 
     return (
         <form onSubmit={onSubmit}>
-            <label>Escribe tu nueva tarea</label>
+            <label>Edita el título de la tarea</label>
             <textarea
                 value={newTodoValue}
                 onChange={onChange}
@@ -54,7 +54,7 @@ function ToDoForm(props) {
                     type="submit"
                     className="TodoForm-button TodoForm-button--add"
                 >
-                    Añadir
+                    Editar
                 </button>
             </div>
         </form>
@@ -62,4 +62,4 @@ function ToDoForm(props) {
 
 }
 
-export { ToDoForm }
+export { ToDoEditForm }
