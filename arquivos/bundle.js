@@ -13,6 +13,7 @@ function ToDoForm(props) {
     var onChange = function onChange(event) {
         setNewTodoValue(event.target.value);
     };
+
     var onCancel = function onCancel() {
         props.setOpenModal(false);
         var element = document.getElementsByClassName("CreateTodoButton");
@@ -22,10 +23,12 @@ function ToDoForm(props) {
     var onSubmit = function onSubmit(event) {
         // stops the redirect
         event.preventDefault();
-        props.addTodo(newTodoValue);
-        props.setOpenModal(false);
-        var element = document.getElementsByClassName("CreateTodoButton");
-        element[0].classList.toggle("close");
+        if (newTodoValue.length) {
+            props.addTodo(newTodoValue);
+            props.setOpenModal(false);
+            var element = document.getElementsByClassName("CreateTodoButton");
+            element[0].classList.toggle("close");
+        }
     };
 
     var commentEnterSubmit = function commentEnterSubmit(e) {
@@ -108,6 +111,15 @@ function ToDoCounter(props) {
 
 function ToDoItem(props) {
 
+    var onClickButton = function onClickButton() {
+        props.setOpenEditModal(function (prevState) {
+            return !prevState;
+        });
+        props.onSetIndexEditFunction();
+        var element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
+    };
+
     return React.createElement(
         "li",
         { className: "ToDoItem" },
@@ -117,7 +129,14 @@ function ToDoItem(props) {
                 className: "Icon Icon-check " + (props.completed && 'Icon-check--active'),
                 onClick: props.onComplete
             },
-            React.createElement("i", { "class": "fas fa-check-square" })
+            React.createElement("i", { className: "fas fa-check-square" })
+        ),
+        React.createElement(
+            "span",
+            {
+                className: 'Icon Icon-move'
+            },
+            React.createElement("i", { className: "fas fa-th" })
         ),
         React.createElement(
             "p",
@@ -127,10 +146,18 @@ function ToDoItem(props) {
         React.createElement(
             "span",
             {
+                className: "Icon Icon-edit",
+                onClick: onClickButton
+            },
+            React.createElement("i", { className: "fas fa-edit" })
+        ),
+        React.createElement(
+            "span",
+            {
                 className: "Icon Icon-delete",
                 onClick: props.onDelete
             },
-            React.createElement("i", { "class": "far fa-trash-alt" })
+            React.createElement("i", { className: "far fa-trash-alt" })
         )
     );
 }
@@ -146,6 +173,7 @@ function ToDoList(props) {
         )
     );
 }
+
 function ToDoSearch(_ref) {
     var searchValue = _ref.searchValue,
         setSearchValue = _ref.setSearchValue,
@@ -204,6 +232,77 @@ function CreateToDoButton(props) {
     );
 }
 
+function ToDoEditForm(props) {
+    var _React$useState3 = React.useState(''),
+        _React$useState4 = _slicedToArray(_React$useState3, 2),
+        newTodoValue = _React$useState4[0],
+        setNewTodoValue = _React$useState4[1];
+
+    var onChange = function onChange(event) {
+        setNewTodoValue(event.target.value);
+    };
+
+    var onCancel = function onCancel() {
+        props.setOpenEditModal(false);
+        var element = document.getElementsByClassName("CreateTodoButton");
+        element[0].classList.toggle("close");
+    };
+
+    var onSubmit = function onSubmit(event) {
+        // stops the redirect
+        event.preventDefault();
+        if (newTodoValue.length) {
+            props.editTodo(props.indexEdit, newTodoValue);
+            props.setOpenEditModal(false);
+            var element = document.getElementsByClassName("CreateTodoButton");
+            element[0].classList.toggle("close");
+        }
+    };
+
+    var commentEnterSubmit = function commentEnterSubmit(e) {
+        if (e.key === "Enter" && e.shiftKey === false) {
+            return onSubmit(e);
+        }
+    };
+
+    return React.createElement(
+        "form",
+        { onSubmit: onSubmit },
+        React.createElement(
+            "label",
+            null,
+            "Edita el t\xEDtulo de la tarea"
+        ),
+        React.createElement("textarea", {
+            value: newTodoValue,
+            onChange: onChange,
+            onKeyPress: commentEnterSubmit,
+            placeholder: "Escribe el t\xEDtulo de la tarea..."
+        }),
+        React.createElement(
+            "div",
+            { className: "TodoForm-buttonContainer" },
+            React.createElement(
+                "button",
+                {
+                    type: "button",
+                    onClick: onCancel,
+                    className: "TodoForm-button TodoForm-button--cancel"
+                },
+                "Cancelar"
+            ),
+            React.createElement(
+                "button",
+                {
+                    type: "submit",
+                    className: "TodoForm-button TodoForm-button--add"
+                },
+                "Editar"
+            )
+        )
+    );
+}
+
 // const defaultToDos = [
 //     { text: 'Programar Flags Sale Event', completed: true },
 //     { text: 'Flags Bancolombia Carrousel', completed: true },
@@ -213,45 +312,84 @@ function CreateToDoButton(props) {
 // ];
 
 function useLocalStorage(itemName, initialValue) {
-    var localStorageItem = localStorage.getItem(itemName);
-    var parsedItem = void 0;
+    var _React$useState5 = React.useState(false),
+        _React$useState6 = _slicedToArray(_React$useState5, 2),
+        error = _React$useState6[0],
+        setError = _React$useState6[1];
 
-    if (!localStorageItem) {
-        localStorage.setItem(itemName, JSON.stringify(initialValue));
-        parsedItem = initialValue;
-    } else {
-        parsedItem = JSON.parse(localStorageItem);
-    }
+    var _React$useState7 = React.useState(true),
+        _React$useState8 = _slicedToArray(_React$useState7, 2),
+        loading = _React$useState8[0],
+        setLoading = _React$useState8[1];
 
-    var _React$useState3 = React.useState(parsedItem),
-        _React$useState4 = _slicedToArray(_React$useState3, 2),
-        item = _React$useState4[0],
-        setItem = _React$useState4[1];
+    var _React$useState9 = React.useState(initialValue),
+        _React$useState10 = _slicedToArray(_React$useState9, 2),
+        item = _React$useState10[0],
+        setItem = _React$useState10[1];
+
+    React.useEffect(function () {
+        try {
+            var localStorageItem = localStorage.getItem(itemName);
+            var parsedItem = void 0;
+
+            if (!localStorageItem) {
+                localStorage.setItem(itemName, JSON.stringify(initialValue));
+                parsedItem = initialValue;
+            } else {
+                parsedItem = JSON.parse(localStorageItem);
+            }
+
+            setItem(parsedItem);
+            setLoading(false);
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
 
     var saveItem = function saveItem(newItem) {
-        var stringifiedItem = JSON.stringify(newItem);
-        localStorage.setItem(itemName, stringifiedItem);
-        setItem(newItem);
+        try {
+            var stringifiedItem = JSON.stringify(newItem);
+            localStorage.setItem(itemName, stringifiedItem);
+            setItem(newItem);
+        } catch (error) {
+            setError(error);
+        }
     };
 
-    return [item, saveItem];
+    return {
+        item: item,
+        saveItem: saveItem,
+        loading: loading,
+        error: error
+    };
 }
 
 function App() {
     var _useLocalStorage = useLocalStorage('TODOS_V1', []),
-        _useLocalStorage2 = _slicedToArray(_useLocalStorage, 2),
-        todos = _useLocalStorage2[0],
-        saveTodos = _useLocalStorage2[1];
+        todos = _useLocalStorage.item,
+        saveTodos = _useLocalStorage.saveItem,
+        loading = _useLocalStorage.loading,
+        error = _useLocalStorage.error;
 
-    var _React$useState5 = React.useState(''),
-        _React$useState6 = _slicedToArray(_React$useState5, 2),
-        searchValue = _React$useState6[0],
-        setSearchValue = _React$useState6[1];
+    var _React$useState11 = React.useState(''),
+        _React$useState12 = _slicedToArray(_React$useState11, 2),
+        searchValue = _React$useState12[0],
+        setSearchValue = _React$useState12[1];
 
-    var _React$useState7 = React.useState(false),
-        _React$useState8 = _slicedToArray(_React$useState7, 2),
-        openModal = _React$useState8[0],
-        setOpenModal = _React$useState8[1];
+    var _React$useState13 = React.useState(false),
+        _React$useState14 = _slicedToArray(_React$useState13, 2),
+        openModal = _React$useState14[0],
+        setOpenModal = _React$useState14[1];
+
+    var _React$useState15 = React.useState(false),
+        _React$useState16 = _slicedToArray(_React$useState15, 2),
+        openEditModal = _React$useState16[0],
+        setOpenEditModal = _React$useState16[1];
+
+    var _React$useState17 = React.useState(),
+        _React$useState18 = _slicedToArray(_React$useState17, 2),
+        indexEdit = _React$useState18[0],
+        setindexEdit = _React$useState18[1];
 
     var searchedTodos = [];
 
@@ -296,6 +434,19 @@ function App() {
         saveTodos(newTodos);
     };
 
+    var editTodo = function editTodo(text, newText) {
+        var todoIndex = todos.findIndex(function (todo) {
+            return todo.text === text;
+        });
+        var newTodos = [].concat(_toConsumableArray(todos));
+        newTodos[todoIndex].text = newText;
+        saveTodos(newTodos);
+    };
+
+    var setIndexEditFunction = function setIndexEditFunction(text) {
+        setindexEdit(text);
+    };
+
     return React.createElement(
         React.Fragment,
         null,
@@ -308,6 +459,48 @@ function App() {
         React.createElement(
             ToDoList,
             null,
+            error && React.createElement(
+                "li",
+                { className: "ToDoItem" },
+                React.createElement(
+                    "p",
+                    { className: "TodoItem-p false" },
+                    "Hubo un error, intenta recargar la p\xE1gina..."
+                )
+            ),
+            loading && React.createElement(
+                "li",
+                { className: "ToDoItem" },
+                React.createElement(
+                    "p",
+                    { className: "TodoItem-p false" },
+                    "Cargando listado de tareas..."
+                )
+            ),
+            !loading && !searchedTodos.length && !searchValue.length && React.createElement(
+                "li",
+                { className: "ToDoItem" },
+                React.createElement(
+                    "p",
+                    { className: "TodoItem-p false" },
+                    "\xA1Crea una nueva tarea!"
+                )
+            ),
+            !loading && !searchedTodos.length && !!searchValue.length && React.createElement(
+                "li",
+                { className: "ToDoItem" },
+                React.createElement(
+                    "p",
+                    { className: "TodoItem-p false" },
+                    "No se encontraron resultados para \"",
+                    React.createElement(
+                        "b",
+                        null,
+                        searchValue
+                    ),
+                    "\" "
+                )
+            ),
             searchedTodos.map(function (ToDo) {
                 return React.createElement(ToDoItem, {
                     key: ToDo.text,
@@ -318,13 +511,22 @@ function App() {
                     },
                     onDelete: function onDelete() {
                         return deleteTodo(ToDo.text);
-                    } });
+                    },
+                    onSetIndexEditFunction: function onSetIndexEditFunction() {
+                        return setIndexEditFunction(ToDo.text);
+                    },
+                    setOpenEditModal: setOpenEditModal });
             })
         ),
         !!openModal && React.createElement(
             Modal,
             null,
             React.createElement(ToDoForm, { addTodo: addTodo, setOpenModal: setOpenModal })
+        ),
+        !!openEditModal && React.createElement(
+            Modal,
+            null,
+            React.createElement(ToDoEditForm, { indexEdit: indexEdit, editTodo: editTodo, setOpenEditModal: setOpenEditModal })
         ),
         React.createElement(CreateToDoButton, {
             setOpenModal: setOpenModal
