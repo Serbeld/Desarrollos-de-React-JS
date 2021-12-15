@@ -15,7 +15,6 @@
     font-size: 1rem;
     line-height: 26px;
     font-weight: 500;
-    max-width: 430px;
     overflow: hidden;
 }
 
@@ -51,11 +50,6 @@
 
 .Icon-delete:hover {
     color: #f85353;
-}
-
-span.Icon.Icon-move {
-    left: 2.2em;
-    position: relative;
 }
 
 span.Icon.Icon-edit {

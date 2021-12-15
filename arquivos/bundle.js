@@ -132,13 +132,6 @@ function ToDoItem(props) {
             React.createElement("i", { className: "fas fa-check-square" })
         ),
         React.createElement(
-            "span",
-            {
-                className: 'Icon Icon-move'
-            },
-            React.createElement("i", { className: "fas fa-th" })
-        ),
-        React.createElement(
             "p",
             { className: "TodoItem-p " + (props.completed && 'TodoItem-p--complete') },
             props.text
