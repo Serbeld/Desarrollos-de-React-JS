@@ -93,11 +93,6 @@ function ToDoItem(props) {
             >
                 <i className="fas fa-check-square"></i>
             </span>
-            <span
-                className={'Icon Icon-move'}
-            >
-                <i className="fas fa-th"></i>
-            </span>
             <p className={`TodoItem-p ${props.completed && 'TodoItem-p--complete'}`}>
                 {props.text}
             </p>

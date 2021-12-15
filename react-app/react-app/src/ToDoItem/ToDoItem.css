@@ -10,11 +10,12 @@
 }
 
 .TodoItem-p {
-    margin: 14px 75px 14px 3.5rem;
+    margin: 14px 100px 14px 3.5rem;
     width: calc(100% - 50px);
     font-size: 1rem;
     line-height: 26px;
     font-weight: 500;
+    overflow: hidden;
 }
 
 .TodoItem-p--complete {
@@ -49,11 +50,6 @@
 
 .Icon-delete:hover {
     color: #f85353;
-}
-
-span.Icon.Icon-move {
-    left: 2.2em;
-    position: relative;
 }
 
 span.Icon.Icon-edit {
