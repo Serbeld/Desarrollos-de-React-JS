@@ -15,7 +15,11 @@ function useLocalStorage(itemName, initialValue) {
                     localStorage.setItem(itemName, JSON.stringify(initialValue));
                     parsedItem = initialValue;
                 } else {
-                    parsedItem = JSON.parse(localStorageItem);
+                    try {
+                        parsedItem = JSON.parse(localStorageItem);
+                    } catch (error) {
+                        parsedItem = initialValue;
+                    }
                 }
 
                 setItem(parsedItem);

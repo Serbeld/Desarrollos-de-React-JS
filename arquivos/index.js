@@ -1,3 +1,5 @@
+const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
+
 function ToDoForm(props) {
 
     const [newTodoValue, setNewTodoValue] = React.useState('');
@@ -15,7 +17,7 @@ function ToDoForm(props) {
     const onSubmit = (event) => {
         // stops the redirect
         event.preventDefault();
-        if(newTodoValue.length){
+        if (newTodoValue.length) {
             props.addTodo(newTodoValue);
             props.setOpenModal(false);
             let element = document.getElementsByClassName("CreateTodoButton");
@@ -86,41 +88,55 @@ function ToDoItem(props) {
     };
 
     return (
-        <li className="ToDoItem">
-            <span
-                className={`Icon Icon-check ${props.completed && 'Icon-check--active'}`}
-                onClick={props.onComplete}
-            >
-                <i className="fas fa-check-square"></i>
-            </span>
-            <p className={`TodoItem-p ${props.completed && 'TodoItem-p--complete'}`}>
-                {props.text}
-            </p>
-            <span
-                className="Icon Icon-edit"
-                onClick={onClickButton}
-            >
-                <i className="fas fa-edit"></i>
-            </span>
-            <span
-                className="Icon Icon-delete"
-                onClick={props.onDelete}
-            >
-                <i className="far fa-trash-alt"></i>
-            </span>
-        </li>
-
-        
+        <Draggable draggableId={props.text} index={props.index}>
+            {(draggableProvided) => (
+                <li className="ToDoItem"
+                    {...draggableProvided.draggableProps}
+                    ref={draggableProvided.innerRef}
+                    {...draggableProvided.dragHandleProps}
+                >
+                    <span
+                        className={`Icon Icon-check ${props.completed && 'Icon-check--active'}`}
+                        onClick={props.onComplete}
+                    >
+                        <i className="fas fa-check-square"></i>
+                    </span>
+                    <p className={`TodoItem-p ${props.completed && 'TodoItem-p--complete'}`}>
+                        {props.text}
+                    </p>
+                    <span
+                        className="Icon Icon-edit"
+                        onClick={onClickButton}
+                    >
+                        <i className="fas fa-edit"></i>
+                    </span>
+                    <span
+                        className="Icon Icon-delete"
+                        onClick={props.onDelete}
+                    >
+                        <i className="far fa-trash-alt"></i>
+                    </span>
+                </li>
+            )}
+        </Draggable>
     );
 }
 
 function ToDoList(props) {
     return (
-        <section>
-            <ul>
-                {props.children}
-            </ul>
-        </section>
+        <Droppable droppableId="droppable">
+            {(droppableProvided) =>
+            (
+                <ul
+                    {...droppableProvided.droppableProps}
+                    ref={droppableProvided.innerRef}
+                >
+                    {props.children}
+                    {droppableProvided.placeholder}
+                </ul>
+            )
+            }
+        </Droppable>
     );
 }
 
@@ -192,7 +208,7 @@ function ToDoEditForm(props) {
     const onSubmit = (event) => {
         // stops the redirect
         event.preventDefault();
-        if(newTodoValue.length){
+        if (newTodoValue.length) {
             props.editTodo(props.indexEdit, newTodoValue);
             props.setOpenEditModal(false);
             let element = document.getElementsByClassName("CreateTodoButton");
@@ -250,23 +266,27 @@ function useLocalStorage(itemName, initialValue) {
     const [item, setItem] = React.useState(initialValue);
 
     React.useEffect(() => {
-            try {
-                const localStorageItem = localStorage.getItem(itemName);
-                let parsedItem;
+        try {
+            const localStorageItem = localStorage.getItem(itemName);
+            let parsedItem;
 
-                if (!localStorageItem) {
-                    localStorage.setItem(itemName, JSON.stringify(initialValue));
-                    parsedItem = initialValue;
-                } else {
+            if (!localStorageItem) {
+                localStorage.setItem(itemName, JSON.stringify(initialValue));
+                parsedItem = initialValue;
+            } else {
+                try {
                     parsedItem = JSON.parse(localStorageItem);
+                } catch (error) {
+                    parsedItem = initialValue;
                 }
-
-                setItem(parsedItem);
-                setLoading(false);
-            } catch (error) {
-                setError(error);
             }
-    },[]);
+
+            setItem(parsedItem);
+            setLoading(false);
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
 
     const saveItem = (newItem) => {
         try {
@@ -348,6 +368,14 @@ function App() {
         setindexEdit(text);
     };
 
+    const reorder = (list, startIndex, endIndex) => {
+        const result = [...list];
+        const [removed] = result.splice(startIndex, 1);
+        result.splice(endIndex, 0, removed);
+        saveTodos(result);
+    };
+
+
     return (
         <React.Fragment>
 
@@ -358,25 +386,46 @@ function App() {
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}
             />
+            <DragDropContext onDragEnd={(result) => {
+                try {
+                    const { source, destination } = result;
+                    if (!destination) {
+                        return;
+                    }
+                    if (
+                        source.index === destination.index &&
+                        source.droppableId === destination.droppableId
+                    ) {
+                        return;
+                    }
 
-            <ToDoList>
+                    reorder(todos, source.index, destination.index)
 
-                {error && <li className="ToDoItem"><p className="TodoItem-p false">Hubo un error, intenta recargar la página...</p></li>}
-                {loading && <li className="ToDoItem"><p className="TodoItem-p false">Cargando listado de tareas...</p></li>}
-                {(!loading && !searchedTodos.length && !searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">¡Crea una nueva tarea!</p></li>}
-                {(!loading && !searchedTodos.length && !!searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">No se encontraron resultados para "<b>{searchValue}</b>" </p></li>}
+                } catch (error) {
+                    console.warn(error.message)
+                }
+            }}>
 
-                {searchedTodos.map(ToDo => (
-                    <ToDoItem
-                        key={ToDo.text}
-                        text={ToDo.text}
-                        completed={ToDo.completed}
-                        onComplete={() => completeTodo(ToDo.text)}
-                        onDelete={() => deleteTodo(ToDo.text)}
-                        onSetIndexEditFunction={() => setIndexEditFunction(ToDo.text)}
-                        setOpenEditModal={setOpenEditModal} />
-                ))}
-            </ToDoList>
+                <ToDoList>
+                    {error && <li className="ToDoItem"><p className="TodoItem-p false">Hubo un error, intenta recargar la página...</p></li>}
+                    {loading && <li className="ToDoItem"><p className="TodoItem-p false">Cargando listado de tareas...</p></li>}
+                    {(!loading && !searchedTodos.length && !searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">¡Crea una nueva tarea!</p></li>}
+                    {(!loading && !searchedTodos.length && !!searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">No se encontraron resultados para "<b>{searchValue}</b>" </p></li>}
+
+                    {searchedTodos.map((ToDo, index) => (
+                        <ToDoItem
+                            key={ToDo.text}
+                            text={ToDo.text}
+                            completed={ToDo.completed}
+                            onComplete={() => completeTodo(ToDo.text)}
+                            onDelete={() => deleteTodo(ToDo.text)}
+                            onSetIndexEditFunction={() => setIndexEditFunction(ToDo.text)}
+                            setOpenEditModal={setOpenEditModal}
+                            index={index} />
+                    ))}
+                </ToDoList>
+            </DragDropContext>
+
 
             {!!openModal && (
                 <Modal>

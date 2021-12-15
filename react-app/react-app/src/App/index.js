@@ -9,6 +9,7 @@ import { ToDoForm } from "../ToDoForm";
 import { ToDoEditForm } from "../ToDoEditForm";
 import { CreateToDoButton } from "../CreateToDoButton";
 import { Modal } from "../Modal";
+import { DragDropContext } from "react-beautiful-dnd";
 import { useLocalStorage } from '../ToDoContext/UseLocalStorage.js';
 
 function App() {
@@ -73,6 +74,13 @@ function App() {
     setindexEdit(text);
   };
 
+  const reorder = (list, startIndex, endIndex) => {
+    const result = [...list];
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    saveTodos(result); 
+  };
+
   return (
 
     <React.Fragment>
@@ -84,25 +92,46 @@ function App() {
         searchValue={searchValue}
         setSearchValue={setSearchValue}
       />
+      <DragDropContext onDragEnd={(result) => {
+        try {
+          const { source, destination } = result;
+          if (!destination) {
+            return;
+          }
+          if (
+            source.index === destination.index &&
+            source.droppableId === destination.droppableId
+          ) {
+            return;
+          }
 
-      <ToDoList>
+          reorder(todos, source.index, destination.index)
 
-        {error && <li className="ToDoItem"><p className="TodoItem-p false">Hubo un error, intenta recargar la página...</p></li>}
-        {loading && <li className="ToDoItem"><p className="TodoItem-p false">Cargando listado de tareas...</p></li>}
-        {(!loading && !searchedTodos.length && !searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">¡Crea una nueva tarea!</p></li>}
-        {(!loading && !searchedTodos.length && !!searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">No se encontraron resultados para "<b>{searchValue}</b>" </p></li>}
+        } catch (error) {
+          console.warn(error.message)
+        }
+      }}>
 
-        {searchedTodos.map(ToDo => (
-          <ToDoItem
-            key={ToDo.text}
-            text={ToDo.text}
-            completed={ToDo.completed}
-            onComplete={() => completeTodo(ToDo.text)}
-            onDelete={() => deleteTodo(ToDo.text)}
-            onSetIndexEditFunction={() => setIndexEditFunction(ToDo.text)}
-            setOpenEditModal={setOpenEditModal} />
-        ))}
-      </ToDoList>
+        <ToDoList>
+          {error && <li className="ToDoItem"><p className="TodoItem-p false">Hubo un error, intenta recargar la página...</p></li>}
+          {loading && <li className="ToDoItem"><p className="TodoItem-p false">Cargando listado de tareas...</p></li>}
+          {(!loading && !searchedTodos.length && !searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">¡Crea una nueva tarea!</p></li>}
+          {(!loading && !searchedTodos.length && !!searchValue.length) && <li className="ToDoItem"><p className="TodoItem-p false">No se encontraron resultados para "<b>{searchValue}</b>" </p></li>}
+
+          {searchedTodos.map((ToDo, index) => (
+            <ToDoItem
+              key={ToDo.text}
+              text={ToDo.text}
+              completed={ToDo.completed}
+              onComplete={() => completeTodo(ToDo.text)}
+              onDelete={() => deleteTodo(ToDo.text)}
+              onSetIndexEditFunction={() => setIndexEditFunction(ToDo.text)}
+              setOpenEditModal={setOpenEditModal}
+              index={index} />
+          ))}
+        </ToDoList>
+      </DragDropContext>
+
 
       {!!openModal && (
         <Modal>
