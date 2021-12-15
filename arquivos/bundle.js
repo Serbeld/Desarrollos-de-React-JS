@@ -1,8 +1,16 @@
 "use strict";
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var _window$ReactBeautifu = window.ReactBeautifulDnd,
+    DragDropContext = _window$ReactBeautifu.DragDropContext,
+    Draggable = _window$ReactBeautifu.Draggable,
+    Droppable = _window$ReactBeautifu.Droppable;
+
 
 function ToDoForm(props) {
     var _React$useState = React.useState(''),
@@ -121,49 +129,63 @@ function ToDoItem(props) {
     };
 
     return React.createElement(
-        "li",
-        { className: "ToDoItem" },
-        React.createElement(
-            "span",
-            {
-                className: "Icon Icon-check " + (props.completed && 'Icon-check--active'),
-                onClick: props.onComplete
-            },
-            React.createElement("i", { className: "fas fa-check-square" })
-        ),
-        React.createElement(
-            "p",
-            { className: "TodoItem-p " + (props.completed && 'TodoItem-p--complete') },
-            props.text
-        ),
-        React.createElement(
-            "span",
-            {
-                className: "Icon Icon-edit",
-                onClick: onClickButton
-            },
-            React.createElement("i", { className: "fas fa-edit" })
-        ),
-        React.createElement(
-            "span",
-            {
-                className: "Icon Icon-delete",
-                onClick: props.onDelete
-            },
-            React.createElement("i", { className: "far fa-trash-alt" })
-        )
+        Draggable,
+        { draggableId: props.text, index: props.index },
+        function (draggableProvided) {
+            return React.createElement(
+                "li",
+                _extends({ className: "ToDoItem"
+                }, draggableProvided.draggableProps, {
+                    ref: draggableProvided.innerRef
+                }, draggableProvided.dragHandleProps),
+                React.createElement(
+                    "span",
+                    {
+                        className: "Icon Icon-check " + (props.completed && 'Icon-check--active'),
+                        onClick: props.onComplete
+                    },
+                    React.createElement("i", { className: "fas fa-check-square" })
+                ),
+                React.createElement(
+                    "p",
+                    { className: "TodoItem-p " + (props.completed && 'TodoItem-p--complete') },
+                    props.text
+                ),
+                React.createElement(
+                    "span",
+                    {
+                        className: "Icon Icon-edit",
+                        onClick: onClickButton
+                    },
+                    React.createElement("i", { className: "fas fa-edit" })
+                ),
+                React.createElement(
+                    "span",
+                    {
+                        className: "Icon Icon-delete",
+                        onClick: props.onDelete
+                    },
+                    React.createElement("i", { className: "far fa-trash-alt" })
+                )
+            );
+        }
     );
 }
 
 function ToDoList(props) {
     return React.createElement(
-        "section",
-        null,
-        React.createElement(
-            "ul",
-            null,
-            props.children
-        )
+        Droppable,
+        { droppableId: "droppable" },
+        function (droppableProvided) {
+            return React.createElement(
+                "ul",
+                _extends({}, droppableProvided.droppableProps, {
+                    ref: droppableProvided.innerRef
+                }),
+                props.children,
+                droppableProvided.placeholder
+            );
+        }
     );
 }
 
@@ -329,7 +351,11 @@ function useLocalStorage(itemName, initialValue) {
                 localStorage.setItem(itemName, JSON.stringify(initialValue));
                 parsedItem = initialValue;
             } else {
-                parsedItem = JSON.parse(localStorageItem);
+                try {
+                    parsedItem = JSON.parse(localStorageItem);
+                } catch (error) {
+                    parsedItem = initialValue;
+                }
             }
 
             setItem(parsedItem);
@@ -440,6 +466,17 @@ function App() {
         setindexEdit(text);
     };
 
+    var reorder = function reorder(list, startIndex, endIndex) {
+        var result = [].concat(_toConsumableArray(list));
+
+        var _result$splice = result.splice(startIndex, 1),
+            _result$splice2 = _slicedToArray(_result$splice, 1),
+            removed = _result$splice2[0];
+
+        result.splice(endIndex, 0, removed);
+        saveTodos(result);
+    };
+
     return React.createElement(
         React.Fragment,
         null,
@@ -450,66 +487,87 @@ function App() {
             setSearchValue: setSearchValue
         }),
         React.createElement(
-            ToDoList,
-            null,
-            error && React.createElement(
-                "li",
-                { className: "ToDoItem" },
-                React.createElement(
-                    "p",
-                    { className: "TodoItem-p false" },
-                    "Hubo un error, intenta recargar la p\xE1gina..."
-                )
-            ),
-            loading && React.createElement(
-                "li",
-                { className: "ToDoItem" },
-                React.createElement(
-                    "p",
-                    { className: "TodoItem-p false" },
-                    "Cargando listado de tareas..."
-                )
-            ),
-            !loading && !searchedTodos.length && !searchValue.length && React.createElement(
-                "li",
-                { className: "ToDoItem" },
-                React.createElement(
-                    "p",
-                    { className: "TodoItem-p false" },
-                    "\xA1Crea una nueva tarea!"
-                )
-            ),
-            !loading && !searchedTodos.length && !!searchValue.length && React.createElement(
-                "li",
-                { className: "ToDoItem" },
-                React.createElement(
-                    "p",
-                    { className: "TodoItem-p false" },
-                    "No se encontraron resultados para \"",
+            DragDropContext,
+            { onDragEnd: function onDragEnd(result) {
+                    try {
+                        var source = result.source,
+                            destination = result.destination;
+
+                        if (!destination) {
+                            return;
+                        }
+                        if (source.index === destination.index && source.droppableId === destination.droppableId) {
+                            return;
+                        }
+
+                        reorder(todos, source.index, destination.index);
+                    } catch (error) {
+                        console.warn(error.message);
+                    }
+                } },
+            React.createElement(
+                ToDoList,
+                null,
+                error && React.createElement(
+                    "li",
+                    { className: "ToDoItem" },
                     React.createElement(
-                        "b",
-                        null,
-                        searchValue
-                    ),
-                    "\" "
-                )
-            ),
-            searchedTodos.map(function (ToDo) {
-                return React.createElement(ToDoItem, {
-                    key: ToDo.text,
-                    text: ToDo.text,
-                    completed: ToDo.completed,
-                    onComplete: function onComplete() {
-                        return completeTodo(ToDo.text);
-                    },
-                    onDelete: function onDelete() {
-                        return deleteTodo(ToDo.text);
-                    },
-                    onSetIndexEditFunction: function onSetIndexEditFunction() {
-                        return setIndexEditFunction(ToDo.text);
-                    },
-                    setOpenEditModal: setOpenEditModal });
-            })
+                        "p",
+                        { className: "TodoItem-p false" },
+                        "Hubo un error, intenta recargar la p\xE1gina..."
+                    )
+                ),
+                loading && React.createElement(
+                    "li",
+                    { className: "ToDoItem" },
+                    React.createElement(
+                        "p",
+                        { className: "TodoItem-p false" },
+                        "Cargando listado de tareas..."
+                    )
+                ),
+                !loading && !searchedTodos.length && !searchValue.length && React.createElement(
+                    "li",
+                    { className: "ToDoItem" },
+                    React.createElement(
+                        "p",
+                        { className: "TodoItem-p false" },
+                        "\xA1Crea una nueva tarea!"
+                    )
+                ),
+                !loading && !searchedTodos.length && !!searchValue.length && React.createElement(
+                    "li",
+                    { className: "ToDoItem" },
+                    React.createElement(
+                        "p",
+                        { className: "TodoItem-p false" },
+                        "No se encontraron resultados para \"",
+                        React.createElement(
+                            "b",
+                            null,
+                            searchValue
+                        ),
+                        "\" "
+                    )
+                ),
+                searchedTodos.map(function (ToDo, index) {
+                    return React.createElement(ToDoItem, {
+                        key: ToDo.text,
+                        text: ToDo.text,
+                        completed: ToDo.completed,
+                        onComplete: function onComplete() {
+                            return completeTodo(ToDo.text);
+                        },
+                        onDelete: function onDelete() {
+                            return deleteTodo(ToDo.text);
+                        },
+                        onSetIndexEditFunction: function onSetIndexEditFunction() {
+                            return setIndexEditFunction(ToDo.text);
+                        },
+                        setOpenEditModal: setOpenEditModal,
+                        index: index });
+                })
+            )
         ),
         !!openModal && React.createElement(
             Modal,

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel arquivos/index.js --out-file=arquivos/bundle.js --presets=env,react --watch",
     "buildnowatch": "babel arquivos/index.js --out-file=arquivos/bundle.js --presets=env,react"
-},
+  },
   "repository": {
     "type": "git",
     "url": "git+https://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@github.com/Serbeld/PlatziReactJS.git"
@@ -20,6 +20,7 @@
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1"
+    "babel-preset-react": "^6.24.1",
+    "react-beautiful-dnd": "^13.1.0"
   }
 }
