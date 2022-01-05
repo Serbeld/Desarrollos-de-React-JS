@@ -261,9 +261,28 @@ function ToDoEditForm(props) {
 // ];
 
 function useLocalStorage(itemName, initialValue) {
+
+    ////////////////////////////////////////////////////////
+    /// Action Creators ////////////////////////////////////
+    ////////////////////////////////////////////////////////
+
     const [error, setError] = React.useState(false);
     const [loading, setLoading] = React.useState(true);
     const [item, setItem] = React.useState(initialValue);
+
+    const onError = (error) => {
+        setError(error);
+    };
+
+    const onSuccess = (item) => {
+        setError(false);
+        setLoading(false);
+        setItem(item);
+    };
+
+    const onSave = (item) => {
+        setItem(item);
+    };
 
     React.useEffect(() => {
         try {
@@ -281,10 +300,12 @@ function useLocalStorage(itemName, initialValue) {
                 }
             }
 
-            setItem(parsedItem);
-            setLoading(false);
+            onSuccess(parsedItem);
+            // setItem(parsedItem);
+            // setLoading(false);
         } catch (error) {
-            setError(error);
+            onError(error);
+            // setError(error);
         }
     }, []);
 
@@ -292,9 +313,11 @@ function useLocalStorage(itemName, initialValue) {
         try {
             const stringifiedItem = JSON.stringify(newItem);
             localStorage.setItem(itemName, stringifiedItem);
-            setItem(newItem);
+            // setItem(newItem);
+            onSave(newItem);
         } catch (error) {
-            setError(error);
+            onError(error);
+            // setError(error);
         }
     };
 

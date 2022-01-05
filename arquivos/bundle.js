@@ -327,6 +327,9 @@ function ToDoEditForm(props) {
 // ];
 
 function useLocalStorage(itemName, initialValue) {
+
+    ////////////////////////////////////////////////////////
+    /// Action Creators ////////////////////////////////////
     var _React$useState5 = React.useState(false),
         _React$useState6 = _slicedToArray(_React$useState5, 2),
         error = _React$useState6[0],
@@ -341,6 +344,20 @@ function useLocalStorage(itemName, initialValue) {
         _React$useState10 = _slicedToArray(_React$useState9, 2),
         item = _React$useState10[0],
         setItem = _React$useState10[1];
+
+    var onError = function onError(error) {
+        setError(error);
+    };
+
+    var onSuccess = function onSuccess(item) {
+        setError(false);
+        setLoading(false);
+        setItem(item);
+    };
+
+    var onSave = function onSave(item) {
+        setItem(item);
+    };
 
     React.useEffect(function () {
         try {
@@ -358,10 +375,12 @@ function useLocalStorage(itemName, initialValue) {
                 }
             }
 
-            setItem(parsedItem);
-            setLoading(false);
+            onSuccess(parsedItem);
+            // setItem(parsedItem);
+            // setLoading(false);
         } catch (error) {
-            setError(error);
+            onError(error);
+            // setError(error);
         }
     }, []);
 
@@ -369,9 +388,11 @@ function useLocalStorage(itemName, initialValue) {
         try {
             var stringifiedItem = JSON.stringify(newItem);
             localStorage.setItem(itemName, stringifiedItem);
-            setItem(newItem);
+            // setItem(newItem);
+            onSave(newItem);
         } catch (error) {
-            setError(error);
+            onError(error);
+            // setError(error);
         }
     };
 
