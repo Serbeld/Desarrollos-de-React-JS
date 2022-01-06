@@ -3,9 +3,14 @@ This repository is dedicated to programming practices using Node Js. These progr
 
 This repository has the develop and master branches. To update the repository, start from develop by creating a new branch or on the same develop branch.
 
-<img src="https://serbeld.github.io/PlatziReactJS/react-app/react-app/public/logo512.png" alt='Repository created by Sergio Beleño'/>
+The following link contains the app:
+
+    https://serbeld.github.io/PlatziReactJS/
+
+<img src="https://serbeld.github.io/PlatziReactJS/react-app/react-app/public/ReactApp.jpeg" alt='Repository created by Sergio Beleño'/>
 
     Author: Sergio Luis Beleño Díaz
-    Last modified: 23/11/2021
+    Last modified: 06/01/2022
+
 
 End :octocat:
